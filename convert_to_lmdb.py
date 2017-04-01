@@ -102,18 +102,28 @@ def convert_to_lmdb(path_to_dataset_dir_and_digit_struct_mat_file_tuples,
 
         with h5py.File(path_to_digit_struct_mat_file, 'r') as digit_struct_mat_file:
             example_reader = ExampleReader(path_to_image_files)
-            for index, path_to_image_file in enumerate(path_to_image_files):
-                print '(%d/%d) processing %s' % (index + 1, total_files, path_to_image_file)
+            block_size = 10000
 
-                example = example_reader.read_and_convert(digit_struct_mat_file)
-                if example is None:
-                    break
+            for i in xrange(0, total_files, block_size):
+                txns = [writer.begin(write=True) for writer in writers]
 
-                idx = choose_writer_callback(path_to_lmdb_dirs)
-                with writers[idx].begin(write=True) as txn:
+                for offset in xrange(block_size):
+                    idx = choose_writer_callback(path_to_lmdb_dirs)
+                    txn = txns[idx]
+
+                    example = example_reader.read_and_convert(digit_struct_mat_file)
+                    if example is None:
+                        break
+
                     str_id = '{:08}'.format(num_examples[idx] + 1)
                     txn.put(str_id, example.SerializeToString())
-                num_examples[idx] += 1
+                    num_examples[idx] += 1
+
+                    index = i + offset
+                    path_to_image_file = path_to_image_files[index]
+                    print '(%d/%d) %s' % (index + 1, total_files, path_to_image_file)
+
+                [txn.commit() for txn in txns]
 
     for writer in writers:
         writer.close()
