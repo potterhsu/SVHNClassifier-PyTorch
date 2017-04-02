@@ -66,7 +66,9 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
 
 1. (Optional) Test for reading LMDBs
 
+    ```
     Open `read_lmdb_sample.ipynb` in Jupyter
+    ```
 
 1. Train
 
