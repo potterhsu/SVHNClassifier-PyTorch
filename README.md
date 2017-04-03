@@ -85,7 +85,7 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
 1. Evaluate
 
     ```
-    $ python eval.py --data_dir ../data ./logs/model-100.tar
+    $ python eval.py --data_dir ./data ./logs/model-100.tar
     ```
 
 1. Visualize
