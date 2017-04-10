@@ -24,7 +24,7 @@ def main(args):
 
     print 'Start evaluating'
     # _eval(path_to_checkpoint_file, path_to_train_lmdb_dir)
-    _eval(path_to_checkpoint_file, path_to_val_lmdb_dir)
+    # _eval(path_to_checkpoint_file, path_to_val_lmdb_dir)
     _eval(path_to_checkpoint_file, path_to_test_lmdb_dir)
     print 'Done'
 

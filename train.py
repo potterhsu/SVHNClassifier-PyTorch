@@ -66,7 +66,7 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
                                                batch_size=batch_size, shuffle=True,
                                                num_workers=2, pin_memory=True)
     evaluator = Evaluator(path_to_val_lmdb_dir)
-    optimizer = optim.SGD(model.parameters(), lr=initial_learning_rate)
+    optimizer = optim.SGD(model.parameters(), lr=initial_learning_rate, momentum=0.9, weight_decay=0.0005)
 
     path_to_losses_npy_file = os.path.join(path_to_log_dir, 'losses.npy')
     if os.path.isfile(path_to_losses_npy_file):
@@ -109,7 +109,7 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
             print '==> accuracy = %f, best accuracy %f' % (accuracy, best_accuracy)
 
             if accuracy > best_accuracy:
-                path_to_checkpoint_file = model.save(path_to_log_dir, step=step, maximum=2)
+                path_to_checkpoint_file = model.save(path_to_log_dir, step=step)
                 print '=> Model saved to file: %s' % path_to_checkpoint_file
                 patience = initial_patience
                 best_accuracy = accuracy
