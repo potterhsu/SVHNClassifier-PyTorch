@@ -16,7 +16,7 @@ class Evaluator(object):
             images, length_labels, digits_labels = (Variable(images.cuda(), volatile=True),
                                                     Variable(length_labels.cuda()),
                                                     [Variable(digit_labels.cuda()) for digit_labels in digits_labels])
-            length_logits, digits_logits = model.train()(images)
+            length_logits, digits_logits = model(images)
             length_predictions = length_logits.data.max(1)[1]
             digits_predictions = [digit_logits.data.max(1)[1] for digit_logits in digits_logits]
 
