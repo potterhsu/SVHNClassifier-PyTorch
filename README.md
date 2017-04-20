@@ -8,7 +8,7 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
 ### Accuracy
 ![Accuracy](https://github.com/potterhsu/SVHNClassifier-PyTorch/blob/master/images/accuracy.png?raw=true)
 
-> Accuracy 95.32% on test dataset after about 721,000 steps
+> Accuracy 95.32% on test dataset after 721,000 steps
 
 ## Requirements
 
