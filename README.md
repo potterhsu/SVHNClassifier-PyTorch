@@ -12,6 +12,7 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
 
 ## Requirements
 
+* Python 2.7
 * PyTorch
 * h5py
 
