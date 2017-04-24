@@ -21,6 +21,7 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
     $ sudo pip install h5py
     ```
 
+* Protocol Buffer 3
 * LMDB
 * Visdom
 
