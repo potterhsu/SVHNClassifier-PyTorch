@@ -1,11 +1,13 @@
 import argparse
-import os
 import glob
-import numpy as np
-import h5py
+import os
 import random
-from PIL import Image
+
+import h5py
 import lmdb
+import numpy as np
+from PIL import Image
+
 import example_pb2
 from meta import Meta
 
@@ -29,8 +31,8 @@ class ExampleReader(object):
         item = f['digitStruct']['bbox'][index].item()
         for key in ['label', 'left', 'top', 'width', 'height']:
             attr = f[item][key]
-            values = [f[attr.value[i].item()].value[0][0]
-                      for i in range(len(attr))] if len(attr) > 1 else [attr.value[0][0]]
+            values = [f[attr[i].item()][0][0]
+                      for i in range(len(attr))] if len(attr) > 1 else [attr[0][0]]
             attrs[key] = values
         return attrs
 
@@ -98,16 +100,16 @@ def convert_to_lmdb(path_to_dataset_dir_and_digit_struct_mat_file_tuples,
     for path_to_dataset_dir, path_to_digit_struct_mat_file in path_to_dataset_dir_and_digit_struct_mat_file_tuples:
         path_to_image_files = glob.glob(os.path.join(path_to_dataset_dir, '*.png'))
         total_files = len(path_to_image_files)
-        print '%d files found in %s' % (total_files, path_to_dataset_dir)
+        print('%d files found in %s' % (total_files, path_to_dataset_dir))
 
         with h5py.File(path_to_digit_struct_mat_file, 'r') as digit_struct_mat_file:
             example_reader = ExampleReader(path_to_image_files)
             block_size = 10000
 
-            for i in xrange(0, total_files, block_size):
+            for i in range(0, total_files, block_size):
                 txns = [writer.begin(write=True) for writer in writers]
 
-                for offset in xrange(block_size):
+                for offset in range(block_size):
                     idx = choose_writer_callback(path_to_lmdb_dirs)
                     txn = txns[idx]
 
@@ -116,12 +118,12 @@ def convert_to_lmdb(path_to_dataset_dir_and_digit_struct_mat_file_tuples,
                         break
 
                     str_id = '{:08}'.format(num_examples[idx] + 1)
-                    txn.put(str_id, example.SerializeToString())
+                    txn.put(str_id.encode(), example.SerializeToString())
                     num_examples[idx] += 1
 
                     index = i + offset
                     path_to_image_file = path_to_image_files[index]
-                    print '(%d/%d) %s' % (index + 1, total_files, path_to_image_file)
+                    print('(%d/%d) %s' % (index + 1, total_files, path_to_image_file))
 
                 [txn.commit() for txn in txns]
 
@@ -132,7 +134,7 @@ def convert_to_lmdb(path_to_dataset_dir_and_digit_struct_mat_file_tuples,
 
 
 def create_lmdb_meta_file(num_train_examples, num_val_examples, num_test_examples, path_to_lmdb_meta_file):
-    print 'Saving meta file to %s...' % path_to_lmdb_meta_file
+    print('Saving meta file to %s...' % path_to_lmdb_meta_file)
     meta = Meta()
     meta.num_train_examples = num_train_examples
     meta.num_val_examples = num_val_examples
@@ -156,19 +158,19 @@ def main(args):
     for path_to_dir in [path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_test_lmdb_dir]:
         assert not os.path.exists(path_to_dir), 'LMDB directory %s already exists' % path_to_dir
 
-    print 'Processing training and validation data...'
+    print('Processing training and validation data...')
     [num_train_examples, num_val_examples] = convert_to_lmdb([(path_to_train_dir, path_to_train_digit_struct_mat_file),
                                                               (path_to_extra_dir, path_to_extra_digit_struct_mat_file)],
                                                              [path_to_train_lmdb_dir, path_to_val_lmdb_dir],
                                                              lambda paths: 0 if random.random() > 0.1 else 1)
-    print 'Processing test data...'
+    print('Processing test data...')
     [num_test_examples] = convert_to_lmdb([(path_to_test_dir, path_to_test_digit_struct_mat_file)],
                                           [path_to_test_lmdb_dir],
                                           lambda paths: 0)
 
     create_lmdb_meta_file(num_train_examples, num_val_examples, num_test_examples, path_to_lmdb_meta_file)
 
-    print 'Done'
+    print('Done')
 
 
 if __name__ == '__main__':

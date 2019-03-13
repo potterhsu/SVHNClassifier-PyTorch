@@ -5,26 +5,82 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
 
 ## Results
 
-### Accuracy
-![Accuracy](https://github.com/potterhsu/SVHNClassifier-PyTorch/blob/master/images/accuracy.png?raw=true)
+<table>
+    <tr>
+        <th>Steps</th>
+        <th>GPU</th>
+        <th>Batch Size</th>
+        <th>Learning Rate</th>
+        <th>Patience</th>
+        <th>Decay Step</th>
+        <th>Decay Rate</th>
+        <th>Training Speed (FPS)</th>
+        <th>Accuracy</th>
+    </tr>
+    <tr>
+        <td>
+            <a href="https://drive.google.com/open?id=1_3W1oWXLTLfMcnEIjJoU9FUEKMe2Iar3">
+                54000
+            </a>
+        </td>
+        <td>GTX 1080 Ti</td>
+        <td>512</td>
+        <td>0.16</td>
+        <td>100</td>
+        <td>625</td>
+        <td>0.9</td>
+        <td>~1700</td>
+        <td>95.65%</td>
+    </tr>
+</table>
 
-> Accuracy 95.32% on test dataset after 721,000 steps
+### Sample
+
+![](images/test1.png)
+```
+$ python infer.py -c=./logs/model-54000.pth ./images/test1.png
+length: 2
+digits: [1, 5, 10, 10, 10]
+```
+
+![](images/test2.png)
+```
+$ python infer.py -c=./logs/model-54000.pth ./images/test2.png
+length: 2
+digits: [6, 2, 10, 10, 10]
+```
+
+
+### Loss
+
+![](images/loss.png)
 
 ## Requirements
 
-* Python 2.7
-* PyTorch
+* Python 3.6
+* torch 1.0
+* torchvision 0.2.1
+* visdom
+    ```
+    $ pip install visdom
+    ```
+    
 * h5py
-
     ```
     In Ubuntu:
     $ sudo apt-get install libhdf5-dev
     $ sudo pip install h5py
     ```
 
-* Protocol Buffers 3
-* LMDB
-* Visdom
+* protobuf
+    ```
+    $ pip install protobuf
+    ```
+
+* lmdb
+    ```
+    $ pip install lmdb
+    ```
 
 ## Setup
 
@@ -70,7 +126,7 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
 1. Convert to LMDB format
 
     ```
-    $ python convert_to_lmdb.py --data_dir ../data
+    $ python convert_to_lmdb.py --data_dir ./data
     ```
 
 1. (Optional) Test for reading LMDBs
@@ -82,19 +138,19 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
 1. Train
 
     ```
-    $ python train.py --data_dir ../data --logdir ./logs
+    $ python train.py --data_dir ./data --logdir ./logs
     ```
 
 1. Retrain if you need
 
     ```
-    $ python train.py --data_dir ./data --logdir ./logs_retrain --restore_checkpoint ./logs/model-100.tar
+    $ python train.py --data_dir ./data --logdir ./logs_retrain --restore_checkpoint ./logs/model-100.pth
     ```
 
 1. Evaluate
 
     ```
-    $ python eval.py --data_dir ./data ./logs/model-100.tar
+    $ python eval.py --data_dir ./data ./logs/model-100.pth
     ```
 
 1. Visualize
@@ -102,6 +158,12 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
     ```
     $ python -m visdom.server
     $ python visualize.py --logdir ./logs
+    ```
+
+1. Infer
+
+    ```
+    $ python infer.py --checkpoint=./logs/model-100.pth ./images/test1.png
     ```
 
 1. Clean
