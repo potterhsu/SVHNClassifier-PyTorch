@@ -1,4 +1,4 @@
-# SVHNClassifier C++ Inference
+# SVHNClassifier Inference in C++ using LibTorch
 
 ## Requirements
 

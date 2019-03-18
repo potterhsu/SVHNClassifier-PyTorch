@@ -2,6 +2,7 @@
 
 A PyTorch implementation of [Multi-digit Number Recognition from Street View Imagery using Deep Convolutional Neural Networks](http://arxiv.org/pdf/1312.6082.pdf) 
 
+> If you're interested in C++ inference, move [HERE](cpp)
 
 ## Results
 
@@ -19,7 +20,7 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
     </tr>
     <tr>
         <td>
-            <a href="https://drive.google.com/open?id=1_3W1oWXLTLfMcnEIjJoU9FUEKMe2Iar3">
+            <a href="https://drive.google.com/open?id=1DSg3F5GpouEvU9n7YSPdUKH1CSmkdwSw">
                 54000
             </a>
         </td>
