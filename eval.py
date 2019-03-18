@@ -10,7 +10,7 @@ parser.add_argument('checkpoint', type=str, help='path to evaluate checkpoint, e
 
 def _eval(path_to_checkpoint_file, path_to_eval_lmdb_dir):
     model = Model()
-    model.load(path_to_checkpoint_file)
+    model.restore(path_to_checkpoint_file)
     model.cuda()
     accuracy = Evaluator(path_to_eval_lmdb_dir).evaluate(model)
     print('Evaluate %s on %s, accuracy = %f' % (path_to_checkpoint_file, path_to_eval_lmdb_dir, accuracy))

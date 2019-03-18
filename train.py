@@ -27,13 +27,13 @@ parser.add_argument('-ds', '--decay_steps', default=10000, type=int, help='Defau
 parser.add_argument('-dr', '--decay_rate', default=0.9, type=float, help='Default 0.9')
 
 
-def _loss(length_logits, digits_logits, length_labels, digits_labels):
+def _loss(length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits, length_labels, digits_labels):
     length_cross_entropy = torch.nn.functional.cross_entropy(length_logits, length_labels)
-    digit1_cross_entropy = torch.nn.functional.cross_entropy(digits_logits[0], digits_labels[0])
-    digit2_cross_entropy = torch.nn.functional.cross_entropy(digits_logits[1], digits_labels[1])
-    digit3_cross_entropy = torch.nn.functional.cross_entropy(digits_logits[2], digits_labels[2])
-    digit4_cross_entropy = torch.nn.functional.cross_entropy(digits_logits[3], digits_labels[3])
-    digit5_cross_entropy = torch.nn.functional.cross_entropy(digits_logits[4], digits_labels[4])
+    digit1_cross_entropy = torch.nn.functional.cross_entropy(digit1_logits, digits_labels[0])
+    digit2_cross_entropy = torch.nn.functional.cross_entropy(digit2_logits, digits_labels[1])
+    digit3_cross_entropy = torch.nn.functional.cross_entropy(digit3_logits, digits_labels[2])
+    digit4_cross_entropy = torch.nn.functional.cross_entropy(digit4_logits, digits_labels[3])
+    digit5_cross_entropy = torch.nn.functional.cross_entropy(digit5_logits, digits_labels[4])
     loss = length_cross_entropy + digit1_cross_entropy + digit2_cross_entropy + digit3_cross_entropy + digit4_cross_entropy + digit5_cross_entropy
     return loss
 
@@ -68,7 +68,7 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
 
     if path_to_restore_checkpoint_file is not None:
         assert os.path.isfile(path_to_restore_checkpoint_file), '%s not found' % path_to_restore_checkpoint_file
-        step = model.load(path_to_restore_checkpoint_file)
+        step = model.restore(path_to_restore_checkpoint_file)
         scheduler.last_epoch = step
         print('Model restored from file: %s' % path_to_restore_checkpoint_file)
 
@@ -82,8 +82,8 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
         for batch_idx, (images, length_labels, digits_labels) in enumerate(train_loader):
             start_time = time.time()
             images, length_labels, digits_labels = images.cuda(), length_labels.cuda(), [digit_labels.cuda() for digit_labels in digits_labels]
-            length_logits, digits_logits = model.train()(images)
-            loss = _loss(length_logits, digits_logits, length_labels, digits_labels)
+            length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.train()(images)
+            loss = _loss(length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits, length_labels, digits_labels)
 
             optimizer.zero_grad()
             loss.backward()
@@ -109,7 +109,7 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
             print('==> accuracy = %f, best accuracy %f' % (accuracy, best_accuracy))
 
             if accuracy > best_accuracy:
-                path_to_checkpoint_file = model.save(path_to_log_dir, step=step)
+                path_to_checkpoint_file = model.store(path_to_log_dir, step=step)
                 print('=> Model saved to file: %s' % path_to_checkpoint_file)
                 patience = initial_patience
                 best_accuracy = accuracy

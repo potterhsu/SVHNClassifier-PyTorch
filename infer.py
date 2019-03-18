@@ -13,7 +13,7 @@ parser.add_argument('input', type=str, help='path to input image')
 
 def _infer(path_to_checkpoint_file, path_to_input_image):
     model = Model()
-    model.load(path_to_checkpoint_file)
+    model.restore(path_to_checkpoint_file)
     model.cuda()
 
     with torch.no_grad():
@@ -29,13 +29,17 @@ def _infer(path_to_checkpoint_file, path_to_input_image):
         image = transform(image)
         images = image.unsqueeze(dim=0).cuda()
 
-        length_logits, digits_logits = model(images)
+        length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.eval()(images)
 
-        length_predictions = length_logits.max(1)[1]
-        digits_predictions = [digit_logits.max(1)[1] for digit_logits in digits_logits]
+        length_prediction = length_logits.max(1)[1]
+        digit1_prediction = digit1_logits.max(1)[1]
+        digit2_prediction = digit2_logits.max(1)[1]
+        digit3_prediction = digit3_logits.max(1)[1]
+        digit4_prediction = digit4_logits.max(1)[1]
+        digit5_prediction = digit5_logits.max(1)[1]
 
-        print('length:', length_predictions.item())
-        print('digits:', [it.item() for it in digits_predictions])
+        print('length:', length_prediction.item())
+        print('digits:', digit1_prediction.item(), digit2_prediction.item(), digit3_prediction.item(), digit4_prediction.item(), digit5_prediction.item())
 
 
 def main(args):

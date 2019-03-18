@@ -36,18 +36,18 @@ A PyTorch implementation of [Multi-digit Number Recognition from Street View Ima
 
 ### Sample
 
-![](images/test1.png)
+![](images/test-75.png)
 ```
-$ python infer.py -c=./logs/model-54000.pth ./images/test1.png
+$ python infer.py -c=./logs/model-54000.pth ./images/test-75.png
 length: 2
-digits: [1, 5, 10, 10, 10]
+digits: 7 5 10 10 10
 ```
 
-![](images/test2.png)
+![](images/test-190.png)
 ```
-$ python infer.py -c=./logs/model-54000.pth ./images/test2.png
-length: 2
-digits: [6, 2, 10, 10, 10]
+$ python infer.py -c=./logs/model-54000.pth ./images/test-190.png
+length: 3
+digits: 1 9 0 10 10
 ```
 
 
