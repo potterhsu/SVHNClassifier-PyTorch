@@ -52,7 +52,7 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
     duration = 0.0
 
     model = Model()
-    model.cuda()
+    model.cpu()
 
     transform = transforms.Compose([
         transforms.RandomCrop([54, 54]),
@@ -81,7 +81,7 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
     while True:
         for batch_idx, (images, length_labels, digits_labels) in enumerate(train_loader):
             start_time = time.time()
-            images, length_labels, digits_labels = images.cuda(), length_labels.cuda(), [digit_labels.cuda() for digit_labels in digits_labels]
+            images, length_labels, digits_labels = images.cpu(), length_labels.cpu(), [digit_labels.cpu() for digit_labels in digits_labels]
             length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.train()(images)
             loss = _loss(length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits, length_labels, digits_labels)
 
