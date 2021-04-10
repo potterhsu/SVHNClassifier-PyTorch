@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: svhn_classifier
+    ports:
+      - "50051:50051"
+    command: python server.py --checkpoint logs/model-135000.pth --host=0.0.0.0 --port=50051

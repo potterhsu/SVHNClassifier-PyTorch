@@ -1,0 +1,4 @@
+data/
+images/
+logs/
+!logs/model-135000.pth

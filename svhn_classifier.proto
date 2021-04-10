@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+service SvhnClassifier {
+    rpc Predict(Image) returns (Prediction) {}
+}
+
+message Image {
+    bytes data = 1;
+    bool center_crop = 2;
+}
+
+message Prediction {
+    int32 length = 1;
+    repeated int32 digits = 2;
+}
