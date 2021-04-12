@@ -22,7 +22,7 @@ parser.add_argument('-r', '--restore_checkpoint', default=None,
                     help='path to restore checkpoint, e.g. ./logs/model-100.pth')
 parser.add_argument('-bs', '--batch_size', default=32, type=int,  help='Default 32')
 parser.add_argument('-lr', '--learning_rate', default=1e-2, type=float, help='Default 1e-2')
-parser.add_argument('-p', '--patience', default=100, type=int, help='Default 100, set -1 to train infinitely')
+parser.add_argument('-p', '--patience', default=2, type=int, help='Default 100, set -1 to train infinitely')
 parser.add_argument('-ds', '--decay_steps', default=10000, type=int, help='Default 10000')
 parser.add_argument('-dr', '--decay_rate', default=0.9, type=float, help='Default 0.9')
 
