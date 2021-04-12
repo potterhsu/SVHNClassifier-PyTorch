@@ -61,7 +61,7 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
     ])
     train_loader = torch.utils.data.DataLoader(Dataset(path_to_train_lmdb_dir, transform),
                                                batch_size=batch_size, shuffle=True,
-                                               num_workers=4, pin_memory=True)
+                                               num_workers=0, pin_memory=True)
     evaluator = Evaluator(path_to_val_lmdb_dir)
     optimizer = optim.SGD(model.parameters(), lr=initial_learning_rate, momentum=0.9, weight_decay=0.0005)
     scheduler = StepLR(optimizer, step_size=training_options['decay_steps'], gamma=training_options['decay_rate'])
