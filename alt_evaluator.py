@@ -51,11 +51,11 @@ class AltEvaluator(object):
                 digit5_results = zip(digit5_predictions,digit5_logits_list)
                 
         results = {
-            "length": length_results,
-            "digit1": digit1_results, 
-            "digit2": digit2_results,
-            "digit3": digit3_results,
-            "digit4": digit4_results,
-            "digit5": digit5_results,
+            "length": list(length_results),
+            "digit1": list(digit1_results), 
+            "digit2": list(digit2_results),
+            "digit3": list(digit3_results),
+            "digit4": list(digit4_results),
+            "digit5": list(digit5_results),
         }
         return results
