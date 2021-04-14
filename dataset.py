@@ -25,6 +25,8 @@ class Dataset(data.Dataset):
         example = example_pb2.Example()
         example.ParseFromString(value)
 
+        path = self._keys[index]
+
         image = np.frombuffer(example.image, dtype=np.uint8)
         image = image.reshape([64, 64, 3])
         image = Image.fromarray(image)
@@ -33,4 +35,4 @@ class Dataset(data.Dataset):
         length = example.length
         digits = example.digits
 
-        return image, length, digits
+        return image, length, digits, path

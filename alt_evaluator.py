@@ -15,8 +15,10 @@ class AltEvaluator(object):
         self._loader = torch.utils.data.DataLoader(Dataset(path_to_lmdb_dir, transform), batch_size=128, shuffle=False)
 
     def evaluate(self, model):
+        results = []
+
         with torch.no_grad():
-            for _, (images, length_labels, digits_labels) in enumerate(self._loader):
+            for _, (images, length_labels, digits_labels, paths) in enumerate(self._loader):
                 images, length_labels, digits_labels = images.cpu(), length_labels.cpu(), [digit_labels.cpu() for digit_labels in digits_labels]
                 length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.eval()(images)
 
@@ -24,7 +26,7 @@ class AltEvaluator(object):
                 length_predictions = length_logits.max(1)[1].tolist()
                 length_logits_list = length_logits.tolist()
                 length_results = zip(length_predictions,length_logits_list)
-                
+
                 # digit1
                 digit1_predictions = digit1_logits.max(1)[1].tolist()
                 digit1_logits_list = digit1_logits.tolist()
@@ -50,12 +52,14 @@ class AltEvaluator(object):
                 digit5_logits_list = digit5_logits.tolist()
                 digit5_results = zip(digit5_predictions,digit5_logits_list)
                 
-        results = {
-            "length": list(length_results),
-            "digit1": list(digit1_results), 
-            "digit2": list(digit2_results),
-            "digit3": list(digit3_results),
-            "digit4": list(digit4_results),
-            "digit5": list(digit5_results),
-        }
+                batch_results = {
+                    "length": list(length_results),
+                    "digit1": list(digit1_results),
+                    "digit2": list(digit2_results),
+                    "digit3": list(digit3_results),
+                    "digit4": list(digit4_results),
+                    "digit5": list(digit5_results),
+                    "path": list(map(lambda x: x.decode("utf-8"), paths)),
+                }
+                results.append(batch_results)
         return results

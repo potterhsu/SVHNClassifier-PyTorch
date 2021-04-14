@@ -117,12 +117,11 @@ def convert_to_lmdb(path_to_dataset_dir_and_digit_struct_mat_file_tuples,
                     if example is None:
                         break
 
-                    str_id = '{:08}'.format(num_examples[idx] + 1)
-                    txn.put(str_id.encode(), example.SerializeToString())
-                    num_examples[idx] += 1
-
                     index = i + offset
                     path_to_image_file = path_to_image_files[index]
+                    txn.put(path_to_image_file.encode(), example.SerializeToString())
+                    num_examples[idx] += 1
+                    
                     print('(%d/%d) %s' % (index + 1, total_files, path_to_image_file))
 
                 [txn.commit() for txn in txns]
