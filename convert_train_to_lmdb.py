@@ -144,7 +144,7 @@ def create_lmdb_meta_file(num_train_examples, num_val_examples, path_to_lmdb_met
 
 
 def main(args):
-    path_to_train_dir = os.path.join(args.data_dir, 'train')
+    path_to_train_dir = os.path.join(args.data_dir)
     path_to_train_digit_struct_mat_file = os.path.join(path_to_train_dir, 'digitStruct.mat')
 
     path_to_train_lmdb_dir = os.path.join(args.data_dir, 'train.lmdb')

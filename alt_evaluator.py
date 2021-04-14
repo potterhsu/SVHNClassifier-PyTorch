@@ -70,4 +70,5 @@ class AltEvaluator(object):
                     "path": list(map(lambda x: x.decode("utf-8"), paths)),
                 }
                 results.append(batch_results)
+
         return results
