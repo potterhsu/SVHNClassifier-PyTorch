@@ -22,7 +22,7 @@ parser.add_argument('-r', '--restore_checkpoint', default=None,
                     help='path to restore checkpoint, e.g. ./logs/model-100.pth')
 parser.add_argument('-bs', '--batch_size', default=32, type=int,  help='Default 32')
 parser.add_argument('-lr', '--learning_rate', default=1e-2, type=float, help='Default 1e-2')
-parser.add_argument('-p', '--patience', default=100, type=int, help='Default 100, set -1 to train infinitely')
+parser.add_argument('-p', '--patience', default=2, type=int, help='Default 100, set -1 to train infinitely')
 parser.add_argument('-ds', '--decay_steps', default=10000, type=int, help='Default 10000')
 parser.add_argument('-dr', '--decay_rate', default=0.9, type=float, help='Default 0.9')
 
@@ -61,7 +61,7 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
     ])
     train_loader = torch.utils.data.DataLoader(Dataset(path_to_train_lmdb_dir, transform),
                                                batch_size=batch_size, shuffle=True,
-                                               num_workers=4, pin_memory=True)
+                                               num_workers=0, pin_memory=True)
     evaluator = Evaluator(path_to_val_lmdb_dir)
     optimizer = optim.SGD(model.parameters(), lr=initial_learning_rate, momentum=0.9, weight_decay=0.0005)
     scheduler = StepLR(optimizer, step_size=training_options['decay_steps'], gamma=training_options['decay_rate'])
