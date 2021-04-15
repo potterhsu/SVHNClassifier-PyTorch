@@ -1,7 +1,9 @@
 import argparse
 import json
 import os
+
 from model import Model
+from pathlib import Path
 from alt_evaluator import AltEvaluator
 
 parser = argparse.ArgumentParser()
@@ -19,8 +21,7 @@ def _eval(path_to_checkpoint_file, path_to_data_dir, path_to_log_dir, lmdb_file)
     print(f'Evaluate {path_to_checkpoint_file} on {path_to_eval_lmdb_dir}')
     results = AltEvaluator(path_to_eval_lmdb_dir).evaluate(model)
 
-    model_version = get_model_version(path_to_checkpoint_file)
-    export_to_json(model_version, results, path_to_log_dir)
+    export_evaluate_to_data_dir(path_to_data_dir, results, get_model_version(path_to_checkpoint_file))
 
 
 def get_model_version(path_to_checkpoint_file):
@@ -30,8 +31,14 @@ def get_model_version(path_to_checkpoint_file):
     return substring 
 
 
-def export_to_json(model_version, data, path_to_log_dir):
-    with open(f'{path_to_log_dir}/data-{model_version}', 'w') as f:
+def export_evaluate_to_data_dir(data_dir, data, model_version):
+    evaluate_dir = f"{data_dir}/evaluate"
+    Path(evaluate_dir).mkdir(parents=True, exist_ok=True)
+    export_to_json(evaluate_dir, data, model_version)
+
+
+def export_to_json(path_to_log_dir, data, model_version):
+    with open(f'{path_to_log_dir}/data-{model_version}.json', 'w') as f:
         json.dump(data, f)
 
 
