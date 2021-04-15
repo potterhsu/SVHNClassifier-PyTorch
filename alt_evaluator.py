@@ -18,7 +18,6 @@ class AltEvaluator(object):
         results = []
 
         with torch.no_grad():
-            for _, (images, length_labels, digits_labels, paths) in enumerate(self._loader):
             length_results = 0
             digit1_results = 0
             digit2_results = 0
