@@ -18,17 +18,12 @@ class AltEvaluator(object):
         results = []
 
         with torch.no_grad():
-            length_results = 0
-            digit1_results = 0
-            digit2_results = 0
-            digit3_results = 0
-            digit4_results = 0
-            digit5_results = 0
 
-            for _, (images, length_labels, digits_labels) in enumerate(self._loader):
+            for i, (images, length_labels, digits_labels, paths) in enumerate(self._loader):
                 images, length_labels, digits_labels = images.cpu(), length_labels.cpu(), [digit_labels.cpu() for digit_labels in digits_labels]
                 length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.eval()(images)
-
+                print("Evaluating images in batch: ", i+1)
+                print(paths)
                 # length
                 length_predictions = length_logits.max(1)[1].tolist()
                 length_logits_list = length_logits.tolist()

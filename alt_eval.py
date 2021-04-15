@@ -34,7 +34,7 @@ def export_to_json(model_version, data):
 
 
 def main(args):
-    path_to_test_lmdb_dir = os.path.join(args.data_dir, 'test.lmdb')
+    path_to_test_lmdb_dir = os.path.join(args.data_dir, 'train.lmdb')
     path_to_checkpoint_file = args.checkpoint
     get_model_version(path_to_checkpoint_file)
     print('Start evaluate')
