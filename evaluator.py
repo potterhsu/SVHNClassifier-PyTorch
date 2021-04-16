@@ -12,16 +12,19 @@ class Evaluator(object):
             transforms.ToTensor(),
             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         ])
-        self._loader = torch.utils.data.DataLoader(Dataset(path_to_lmdb_dir, transform), batch_size=128, shuffle=False)
+        self._loader = torch.utils.data.DataLoader(Dataset(path_to_lmdb_dir, transform), batch_size=32, shuffle=False)
 
     def evaluate(self, model):
         num_correct = 0
         needs_include_length = False
 
         with torch.no_grad():
-            for batch_idx, (images, length_labels, digits_labels) in enumerate(self._loader):
+            for batch_idx, (images, length_labels, digits_labels, _) in enumerate(self._loader):
                 images, length_labels, digits_labels = images.cpu(), length_labels.cpu(), [digit_labels.cpu() for digit_labels in digits_labels]
                 length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.eval()(images)
+                
+                if batch_idx == 0:
+                    details = [length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits]
 
                 length_prediction = length_logits.max(1)[1]
                 digit1_prediction = digit1_logits.max(1)[1]
@@ -45,4 +48,4 @@ class Evaluator(object):
                                     digit5_prediction.eq(digits_labels[4])).cpu().sum()
 
         accuracy = num_correct.item() / len(self._loader.dataset)
-        return accuracy
+        return accuracy, details
