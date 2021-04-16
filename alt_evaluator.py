@@ -1,5 +1,6 @@
 import torch
 import torch.utils.data
+import math
 from torchvision import transforms
 
 from dataset import Dataset
@@ -12,17 +13,28 @@ class AltEvaluator(object):
             transforms.ToTensor(),
             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         ])
-        self._loader = torch.utils.data.DataLoader(Dataset(path_to_lmdb_dir, transform), batch_size=128, shuffle=False)
+        self.batch_size = 128
+        self._loader = torch.utils.data.DataLoader(Dataset(path_to_lmdb_dir, transform), batch_size=self.batch_size, shuffle=False)
 
-    def evaluate(self, model):
+    def evaluate(self, model, number_of_images_to_evaluate):
         results = []
+
+        number_of_batches_to_evaluate = math.inf
+        if number_of_images_to_evaluate:
+            number_of_batches_to_evaluate = math.ceil(int(number_of_images_to_evaluate) / self.batch_size)
+            print("Number of batches to evaluate: ", number_of_batches_to_evaluate)
 
         with torch.no_grad():
 
             for i, (images, length_labels, digits_labels, paths) in enumerate(self._loader):
                 images, length_labels, digits_labels = images.cpu(), length_labels.cpu(), [digit_labels.cpu() for digit_labels in digits_labels]
                 length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.eval()(images)
-                print("Evaluating images in batch: ", i+1)
+
+                batch_num = i+1
+                if batch_num > number_of_batches_to_evaluate:
+                    break
+
+                print("Evaluating images in batch: ", batch_num)
                 # length
                 length_predictions = length_logits.max(1)[1].tolist()
                 length_logits_list = length_logits.tolist()
