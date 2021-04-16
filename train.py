@@ -79,7 +79,7 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
         losses = np.empty([0], dtype=np.float32)
 
     while True:
-        for batch_idx, (images, length_labels, digits_labels) in enumerate(train_loader):
+        for batch_idx, (images, length_labels, digits_labels, _) in enumerate(train_loader):
             start_time = time.time()
             images, length_labels, digits_labels = images.cpu(), length_labels.cpu(), [digit_labels.cpu() for digit_labels in digits_labels]
             length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.train()(images)
