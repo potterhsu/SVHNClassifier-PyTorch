@@ -10,8 +10,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--data_dir', default='./data', help='directory to read LMDB files')
 parser.add_argument('-l', '--logdir', default='./logs/evaluate', help='directory to write logs')
 parser.add_argument('-ld', '--lmdb', default='train.lmdb', help='The lmdb file name to be evaluated')
-parser.add_argument('-n', '--num_images', help='The number of images to be evaluated')
-parser.add_argument('checkpoint', type=str, help='path to evaluate checkpoint, e.g. ./logs/model-100.pth')
+parser.add_argument('-n', '--num_images', default=None, help='The number of images to be evaluated')
+parser.add_argument('-ch', '--checkpoint', type=str, help='path to evaluate checkpoint, e.g. ./logs/model-100.pth')
 
 
 def _eval(path_to_checkpoint_file, path_to_data_dir, path_to_log_dir, lmdb_file, number_of_images_to_evaluate):
