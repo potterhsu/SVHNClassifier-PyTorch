@@ -7,34 +7,28 @@ from dataset import Dataset
 
 
 class AltEvaluator(object):
-    def __init__(self, path_to_lmdb_dir):
+    def __init__(self, path_to_lmdb_dir, number_images_to_evaluate):
         transform = transforms.Compose([
             transforms.CenterCrop([54, 54]),
             transforms.ToTensor(),
             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         ])
-        self.batch_size = 128
-        self._loader = torch.utils.data.DataLoader(Dataset(path_to_lmdb_dir, transform), batch_size=self.batch_size, shuffle=False)
+        self.dataset = Dataset(path_to_lmdb_dir, transform)
+        if number_images_to_evaluate:
+            self.dataset = self.dataset[0:int(number_images_to_evaluate)]
+        self.batch_size = 32
+        self._loader = torch.utils.data.DataLoader(self.dataset, batch_size=self.batch_size, shuffle=False)
 
-    def evaluate(self, model, number_of_images_to_evaluate):
+    def evaluate(self, model):
         results = []
-
-        number_of_batches_to_evaluate = math.inf
-        if number_of_images_to_evaluate:
-            number_of_batches_to_evaluate = math.ceil(int(number_of_images_to_evaluate) / self.batch_size)
-            print("Number of batches to evaluate: ", number_of_batches_to_evaluate)
 
         with torch.no_grad():
 
-            for i, (images, length_labels, digits_labels, paths) in enumerate(self._loader):
+            for batch_idx, (images, length_labels, digits_labels, paths) in enumerate(self._loader):
                 images, length_labels, digits_labels = images.cpu(), length_labels.cpu(), [digit_labels.cpu() for digit_labels in digits_labels]
                 length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.eval()(images)
 
-                batch_num = i+1
-                if batch_num > number_of_batches_to_evaluate:
-                    break
-
-                print("Evaluating images in batch: ", batch_num)
+                print("Evaluating images in batch: ", batch_idx)
                 # length
                 length_predictions = length_logits.max(1)[1].tolist()
                 length_logits_list = length_logits.tolist()

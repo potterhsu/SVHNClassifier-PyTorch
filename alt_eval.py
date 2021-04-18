@@ -20,7 +20,7 @@ def _eval(path_to_checkpoint_file, path_to_data_dir, path_to_log_dir, lmdb_file,
     model.restore(path_to_checkpoint_file)
     model.cpu()
     print(f'Evaluate {path_to_checkpoint_file} on {path_to_eval_lmdb_dir}')
-    results = AltEvaluator(path_to_eval_lmdb_dir).evaluate(model, number_of_images_to_evaluate)
+    results = AltEvaluator(path_to_eval_lmdb_dir, number_of_images_to_evaluate).evaluate(model)
 
     export_evaluate_to_data_dir(path_to_data_dir, results, get_model_version(path_to_checkpoint_file))
 
