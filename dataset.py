@@ -19,20 +19,42 @@ class Dataset(data.Dataset):
         return self._length
 
     def __getitem__(self, index):
-        with self._reader.begin() as txn:
-            value = txn.get(self._keys[index])
+        if isinstance(index, slice):
+            result = []
+            for i in range(index.start, index.stop):
+                path = self._keys[i]
 
-        example = example_pb2.Example()
-        example.ParseFromString(value)
+                with self._reader.begin() as txn:
+                    value = txn.get(path)
 
-        path = self._keys[index]
+                example = example_pb2.Example()
+                example.ParseFromString(value)
 
-        image = np.frombuffer(example.image, dtype=np.uint8)
-        image = image.reshape([64, 64, 3])
-        image = Image.fromarray(image)
-        image = self._transform(image)
+                image = np.frombuffer(example.image, dtype=np.uint8)
+                image = image.reshape([64, 64, 3])
+                image = Image.fromarray(image)
+                image = self._transform(image)
 
-        length = example.length
-        digits = example.digits
+                length = example.length
+                digits = example.digits
 
-        return image, length, digits, path
+                result.append((image, length, digits, path))
+            return result
+        else:
+            path = self._keys[index]
+
+            with self._reader.begin() as txn:
+                value = txn.get(path)
+
+            example = example_pb2.Example()
+            example.ParseFromString(value)
+
+            image = np.frombuffer(example.image, dtype=np.uint8)
+            image = image.reshape([64, 64, 3])
+            image = Image.fromarray(image)
+            image = self._transform(image)
+
+            length = example.length
+            digits = example.digits
+
+            return image, length, digits, path
