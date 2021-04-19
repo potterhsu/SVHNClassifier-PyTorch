@@ -22,7 +22,7 @@ parser.add_argument('-r', '--restore_checkpoint', default=None,
                     help='path to restore checkpoint, e.g. ./logs/model-100.pth')
 parser.add_argument('-bs', '--batch_size', default=32, type=int,  help='Default 32')
 parser.add_argument('-lr', '--learning_rate', default=1e-2, type=float, help='Default 1e-2')
-parser.add_argument('-p', '--patience', default=2, type=int, help='Default 100, set -1 to train infinitely')
+parser.add_argument('-p', '--patience', default=100, type=int, help='Default 100, set -1 to train infinitely')
 parser.add_argument('-ds', '--decay_steps', default=10000, type=int, help='Default 10000')
 parser.add_argument('-dr', '--decay_rate', default=0.9, type=float, help='Default 0.9')
 
@@ -78,6 +78,12 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
     else:
         losses = np.empty([0], dtype=np.float32)
 
+    path_to_test_losses_npy_file = os.path.join(path_to_log_dir, 'test_losses.npy')
+    if os.path.isfile(path_to_test_losses_npy_file):
+        test_losses = np.load(path_to_test_losses_npy_file)
+    else:
+        test_losses = np.empty([0], dtype=np.float32)
+
     while True:
         for batch_idx, (images, length_labels, digits_labels, _) in enumerate(train_loader):
             start_time = time.time()
@@ -105,8 +111,13 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
             np.save(path_to_losses_npy_file, losses)
 
             print('=> Evaluating on validation dataset...')
-            accuracy = evaluator.evaluate(model)
+            accuracy, test_loss_args = evaluator.evaluate(model)
+            test_loss = _loss(*test_loss_args, length_labels, digits_labels)
+            test_losses = np.append(test_losses, test_loss.item())
+            np.save(path_to_test_losses_npy_file, test_losses)
+
             print('==> accuracy = %f, best accuracy %f' % (accuracy, best_accuracy))
+            print(f'==> loss = {test_loss}')
 
             if accuracy > best_accuracy:
                 path_to_checkpoint_file = model.store(path_to_log_dir, step=step)

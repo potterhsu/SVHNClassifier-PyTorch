@@ -1,24 +1,28 @@
 import argparse
 import json
 import os
+
 from model import Model
+from pathlib import Path
 from alt_evaluator import AltEvaluator
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--data_dir', default='./data', help='directory to read LMDB files')
-parser.add_argument('checkpoint', type=str, help='path to evaluate checkpoint, e.g. ./logs/model-100.pth')
+parser.add_argument('-l', '--logdir', default='./logs/evaluate', help='directory to write logs')
+parser.add_argument('-ld', '--lmdb', default='train.lmdb', help='The lmdb file name to be evaluated')
+parser.add_argument('-n', '--num_images', default=None, help='The number of images to be evaluated')
+parser.add_argument('-ch', '--checkpoint', type=str, help='path to evaluate checkpoint, e.g. ./logs/model-100.pth')
 
 
-def _eval(path_to_checkpoint_file, path_to_eval_lmdb_dir):
+def _eval(path_to_checkpoint_file, path_to_data_dir, path_to_log_dir, lmdb_file, number_of_images_to_evaluate):
+    path_to_eval_lmdb_dir = os.path.join(path_to_data_dir, lmdb_file)
     model = Model()
     model.restore(path_to_checkpoint_file)
     model.cpu()
-    results = AltEvaluator(path_to_eval_lmdb_dir).evaluate(model)
-    print(f'Evaluate {path_to_checkpoint_file} on {path_to_eval_lmdb_dir}, results =')
-    print(results)
+    print(f'Evaluate {path_to_checkpoint_file} on {path_to_eval_lmdb_dir}')
+    results = AltEvaluator(path_to_eval_lmdb_dir, number_of_images_to_evaluate).evaluate(model)
 
-    model_version = get_model_version(path_to_checkpoint_file)
-    export_to_json(model_version, results)
+    export_evaluate_to_data_dir(path_to_data_dir, results, get_model_version(path_to_checkpoint_file))
 
 
 def get_model_version(path_to_checkpoint_file):
@@ -28,17 +32,27 @@ def get_model_version(path_to_checkpoint_file):
     return substring 
 
 
-def export_to_json(model_version, data):
-    with open(f'../logs/evaluate/data-{model_version}', 'w') as f:
+def export_evaluate_to_data_dir(data_dir, data, model_version):
+    evaluate_dir = f"{data_dir}/evaluate"
+    Path(evaluate_dir).mkdir(parents=True, exist_ok=True)
+    export_to_json(evaluate_dir, data, model_version)
+
+
+def export_to_json(path_to_log_dir, data, model_version):
+    with open(f'{path_to_log_dir}/data-{model_version}.json', 'w') as f:
         json.dump(data, f)
 
 
 def main(args):
-    path_to_test_lmdb_dir = os.path.join(args.data_dir, 'test.lmdb')
+    number_of_images_to_evaluate = args.num_images
+
+    path_to_data_dir = args.data_dir
     path_to_checkpoint_file = args.checkpoint
+    log_dir = args.logdir
+    lmdb_file = args.lmdb
     get_model_version(path_to_checkpoint_file)
     print('Start evaluate')
-    _eval(path_to_checkpoint_file, path_to_test_lmdb_dir)
+    _eval(path_to_checkpoint_file, path_to_data_dir, log_dir, lmdb_file, number_of_images_to_evaluate)
     print('Done')
 
 

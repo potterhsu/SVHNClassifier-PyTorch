@@ -1,34 +1,34 @@
 import torch
 import torch.utils.data
+import math
 from torchvision import transforms
 
 from dataset import Dataset
 
 
 class AltEvaluator(object):
-    def __init__(self, path_to_lmdb_dir):
+    def __init__(self, path_to_lmdb_dir, number_images_to_evaluate):
         transform = transforms.Compose([
             transforms.CenterCrop([54, 54]),
             transforms.ToTensor(),
             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         ])
-        self._loader = torch.utils.data.DataLoader(Dataset(path_to_lmdb_dir, transform), batch_size=128, shuffle=False)
+        self.dataset = Dataset(path_to_lmdb_dir, transform)
+        if number_images_to_evaluate:
+            self.dataset = self.dataset[0:int(number_images_to_evaluate)]
+        self.batch_size = 32
+        self._loader = torch.utils.data.DataLoader(self.dataset, batch_size=self.batch_size, shuffle=False)
 
     def evaluate(self, model):
         results = []
 
         with torch.no_grad():
-            length_results = 0
-            digit1_results = 0
-            digit2_results = 0
-            digit3_results = 0
-            digit4_results = 0
-            digit5_results = 0
 
-            for _, (images, length_labels, digits_labels) in enumerate(self._loader):
+            for batch_idx, (images, length_labels, digits_labels, paths) in enumerate(self._loader):
                 images, length_labels, digits_labels = images.cpu(), length_labels.cpu(), [digit_labels.cpu() for digit_labels in digits_labels]
                 length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.eval()(images)
 
+                print("Evaluating images in batch: ", batch_idx)
                 # length
                 length_predictions = length_logits.max(1)[1].tolist()
                 length_logits_list = length_logits.tolist()
