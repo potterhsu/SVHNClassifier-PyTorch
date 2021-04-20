@@ -22,7 +22,9 @@ def _eval(path_to_checkpoint_file, path_to_data_dir, path_to_log_dir, lmdb_file,
     print(f'Evaluate {path_to_checkpoint_file} on {path_to_eval_lmdb_dir}')
     results = AltEvaluator(path_to_eval_lmdb_dir, number_of_images_to_evaluate).evaluate(model)
 
-    export_evaluate_to_data_dir(path_to_data_dir, results, get_model_version(path_to_checkpoint_file))
+    return results
+
+    # export_evaluate_to_data_dir(path_to_data_dir, results, get_model_version(path_to_checkpoint_file))
 
 
 def get_model_version(path_to_checkpoint_file):
@@ -52,8 +54,9 @@ def main(args):
     lmdb_file = args.lmdb
     get_model_version(path_to_checkpoint_file)
     print('Start evaluate')
-    _eval(path_to_checkpoint_file, path_to_data_dir, log_dir, lmdb_file, number_of_images_to_evaluate)
+    results = _eval(path_to_checkpoint_file, path_to_data_dir, log_dir, lmdb_file, number_of_images_to_evaluate)
     print('Done')
+    return results
 
 
 if __name__ == '__main__':
