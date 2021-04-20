@@ -2,9 +2,9 @@ import argparse
 import json
 import os
 
-from model import Model
+from .model import Model
 from pathlib import Path
-from alt_evaluator import AltEvaluator
+from .alt_evaluator import AltEvaluator
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--data_dir', default='./data', help='directory to read LMDB files')

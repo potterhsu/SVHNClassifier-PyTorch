@@ -11,9 +11,9 @@ import torch.utils.data
 from torch.optim.lr_scheduler import StepLR
 from torchvision import transforms
 
-from dataset import Dataset
-from evaluator import Evaluator
-from model import Model
+from .dataset import Dataset
+from .evaluator import Evaluator
+from .model import Model
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--data_dir', default='./data', help='directory to read LMDB files')

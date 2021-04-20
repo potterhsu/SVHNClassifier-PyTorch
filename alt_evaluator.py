@@ -3,7 +3,7 @@ import torch.utils.data
 import math
 from torchvision import transforms
 
-from dataset import Dataset
+from .dataset import Dataset
 
 
 class AltEvaluator(object):

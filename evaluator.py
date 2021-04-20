@@ -2,7 +2,7 @@ import torch
 import torch.utils.data
 from torchvision import transforms
 
-from dataset import Dataset
+from .dataset import Dataset
 
 
 class Evaluator(object):
