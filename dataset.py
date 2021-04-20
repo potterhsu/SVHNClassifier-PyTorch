@@ -3,7 +3,7 @@ import numpy as np
 import torch.utils.data as data
 from PIL import Image
 
-import example_pb2
+from . import example_pb2
 
 
 class Dataset(data.Dataset):
