@@ -112,12 +112,13 @@ def _train(path_to_train_lmdb_dir, path_to_val_lmdb_dir, path_to_log_dir,
 
             print('=> Evaluating on validation dataset...')
             accuracy, test_loss_args = evaluator.evaluate(model)
-            test_loss = _loss(*test_loss_args, length_labels, digits_labels)
-            test_losses = np.append(test_losses, test_loss.item())
-            np.save(path_to_test_losses_npy_file, test_losses)
+            # TODO - fix bug, this doesn't work with new lmdb files
+            # test_loss = _loss(*test_loss_args, length_labels, digits_labels)
+            # test_losses = np.append(test_losses, test_loss.item())
+            # np.save(path_to_test_losses_npy_file, test_losses)
 
             print('==> accuracy = %f, best accuracy %f' % (accuracy, best_accuracy))
-            print(f'==> loss = {test_loss}')
+            # print(f'==> loss = {test_loss}')
 
             if accuracy > best_accuracy:
                 path_to_checkpoint_file = model.store(path_to_log_dir, step=step)
