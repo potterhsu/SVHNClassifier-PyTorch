@@ -4,6 +4,7 @@ import math
 from torchvision import transforms
 
 from .dataset import Dataset
+from .alt_train import _loss
 
 
 class AltEvaluator(object):
@@ -16,7 +17,7 @@ class AltEvaluator(object):
         self.dataset = Dataset(path_to_lmdb_dir, transform)
         if number_images_to_evaluate:
             self.dataset = self.dataset[0:int(number_images_to_evaluate)]
-        self.batch_size = 32
+        self.batch_size = 1
         self._loader = torch.utils.data.DataLoader(self.dataset, batch_size=self.batch_size, shuffle=False)
 
     def evaluate(self, model):
@@ -28,46 +29,17 @@ class AltEvaluator(object):
                 images, length_labels, digits_labels = images.cpu(), length_labels.cpu(), [digit_labels.cpu() for digit_labels in digits_labels]
                 length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.eval()(images)
 
-                print("Evaluating images in batch: ", batch_idx)
-                # length
-                length_predictions = length_logits.max(1)[1].tolist()
-                length_logits_list = length_logits.tolist()
-                length_results = zip(length_predictions,length_logits_list)
+                print("Evaluating images in batch: ", batch_idx + 1)
 
-                # digit1
-                digit1_predictions = digit1_logits.max(1)[1].tolist()
-                digit1_logits_list = digit1_logits.tolist()
-                digit1_results = zip(digit1_predictions,digit1_logits_list)
-                
-                # digit2
-                digit2_predictions = digit2_logits.max(1)[1].tolist()
-                digit2_logits_list = digit2_logits.tolist()
-                digit2_results = zip(digit2_predictions,digit2_logits_list)
+                # Calculate loss for batch
+                loss = _loss(length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits,
+                             length_labels, digits_labels)
 
-                # digit3
-                digit3_predictions = digit3_logits.max(1)[1].tolist()
-                digit3_logits_list = digit3_logits.tolist()
-                digit3_results = zip(digit3_predictions,digit3_logits_list)
+                # This only makes sense for batch size of 1
+                batch_results = {}
+                for image in paths:
+                    batch_results[image.decode("utf-8")] = {"loss": loss.item()}
 
-                # digit4
-                digit4_predictions = digit4_logits.max(1)[1].tolist()
-                digit4_logits_list = digit4_logits.tolist()
-                digit4_results = zip(digit4_predictions,digit4_logits_list)
-
-                # digit5
-                digit5_predictions = digit5_logits.max(1)[1].tolist()
-                digit5_logits_list = digit5_logits.tolist()
-                digit5_results = zip(digit5_predictions,digit5_logits_list)
-                
-                batch_results = {
-                    "length": list(length_results),
-                    "digit1": list(digit1_results),
-                    "digit2": list(digit2_results),
-                    "digit3": list(digit3_results),
-                    "digit4": list(digit4_results),
-                    "digit5": list(digit5_results),
-                    "path": list(map(lambda x: x.decode("utf-8"), paths)),
-                }
                 results.append(batch_results)
 
         return results
