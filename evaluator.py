@@ -24,7 +24,7 @@ class Evaluator(object):
                 length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits = model.eval()(images)
                 
                 if batch_idx == 0:
-                    details = [length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits]
+                    details = [length_logits, digit1_logits, digit2_logits, digit3_logits, digit4_logits, digit5_logits, length_labels, digits_labels]
 
                 length_prediction = length_logits.max(1)[1]
                 digit1_prediction = digit1_logits.max(1)[1]
